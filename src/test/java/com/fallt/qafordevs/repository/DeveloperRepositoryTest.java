@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
 
 @DataJpaTest
 class DeveloperRepositoryTest {
@@ -116,6 +115,33 @@ class DeveloperRepositoryTest {
         DeveloperEntity obtainedDeveloper = optionalDeveloper.get();
         //then
         assertThat(obtainedDeveloper.getEmail()).isEqualTo(email);
+    }
+
+    @Test
+    @DisplayName("Get all active developers by speciality")
+    void givenThreeDevelopersAndTwoAreActive_whenFindAllActiveBySpeciality_thenReturnedOnlyTwoDevelopers() {
+        //given
+        DeveloperEntity developer1 = DataUtils.getJohnDoeTransient();
+        DeveloperEntity developer2 = DataUtils.getMikeSmithTransient();
+        DeveloperEntity developer3 = DataUtils.getFrankJonesTransient();
+        developerRepository.saveAll(List.of(developer1, developer2, developer3));
+        //when
+        List<DeveloperEntity> activeDevelopers = developerRepository.findAllActiveBySpeciality("Java");
+        //then
+        assertThat(activeDevelopers).hasSize(2);
+    }
+
+    @Test
+    @DisplayName("Test delete developer by id functionality")
+    void givenDeveloperIsSaved_whenDeletedById_thenDeveloperIsRemovedFromDB() {
+        //given
+        DeveloperEntity developer = DataUtils.getJohnDoeTransient();
+        developerRepository.save(developer);
+        //when
+        developerRepository.deleteById(developer.getId());
+        //then
+        Optional<DeveloperEntity> optionalDeveloper = developerRepository.findById(developer.getId());
+        assertThat(optionalDeveloper).isEmpty();
     }
 
 }

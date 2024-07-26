@@ -53,7 +53,7 @@ public class DataUtils {
                 .lastName("Jones")
                 .email("frank.jones@gmail.com")
                 .speciality("Java")
-                .status(Status.ACTIVE)
+                .status(Status.DELETED)
                 .build();
     }
 
@@ -64,7 +64,7 @@ public class DataUtils {
                 .lastName("Jones")
                 .email("frank.jones@gmail.com")
                 .speciality("Java")
-                .status(Status.ACTIVE)
+                .status(Status.DELETED)
                 .build();
     }
 }
