@@ -17,6 +17,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
+import org.testcontainers.junit.jupiter.Testcontainers;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -27,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @AutoConfigureMockMvc
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class ItDeveloperControllerV1Test {
+@Testcontainers
+class ItDeveloperControllerV1Test extends AbstractControllerBaseTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -89,10 +91,11 @@ class ItDeveloperControllerV1Test {
     @DisplayName("Test update developer functionality")
     void givenDeveloperDto_whenUpdateDeveloper_thenSuccessResponse() throws Exception {
         String updatedEmail = "updated@gmail.com";
-        DeveloperDto dto = DataUtils.getJohnDoeDtoPersisted();
-        DeveloperEntity entity = DataUtils.getJohnDoePersisted();
+        DeveloperEntity entity = DataUtils.getJohnDoeTransient();
         developerRepository.save(entity);
+        DeveloperDto dto = DataUtils.getJohnDoeDtoPersisted();
         dto.setEmail(updatedEmail);
+        dto.setId(entity.getId());
         //when
         ResultActions result = mockMvc.perform(put("/api/v1/developers")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -136,7 +139,7 @@ class ItDeveloperControllerV1Test {
         result
                 .andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", CoreMatchers.is(1)))
+                .andExpect(jsonPath("$.id", CoreMatchers.is(entity.getId())))
                 .andExpect(jsonPath("$.firstName", CoreMatchers.is("John")))
                 .andExpect(jsonPath("$.lastName", CoreMatchers.is("Doe")))
                 .andExpect(jsonPath("$.status", CoreMatchers.is("ACTIVE")));
